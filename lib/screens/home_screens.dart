@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/social_network_controller.dart';
 
 class HomeScreens extends StatelessWidget {
+  //Instance of the [SocialNetworkController] to manage posts and comments.
   final SocialNetworkController controller = Get.put(SocialNetworkController());
 
   @override
