@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: HomeScreens(),
-      debugShowCheckedModeBanner: false, // Desactiva el banner de depuración
+      debugShowCheckedModeBanner: false,
     );
   }
 }

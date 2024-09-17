@@ -29,25 +29,88 @@ class HomeScreens extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Posted by: ${post.author}',
-                              style: TextStyle(
-                                color: Colors.blue[900],
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Posted by: ${post.author}',
+                                  style: TextStyle(
+                                    color: Colors.blue[900],
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.edit, color: Colors.grey, size: 18), // Icono más pequeño y gris
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            String newTitle = post.title;
+                                            String newContent = post.content;
+                                            String newImageUrl = post.imageUrl ?? '';
+
+                                            return AlertDialog(
+                                              title: Text('Edit Post'),
+                                              content: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  TextFormField(
+                                                    decoration: InputDecoration(labelText: 'Title'),
+                                                    initialValue: post.title,
+                                                    onChanged: (value) {
+                                                      newTitle = value;
+                                                    },
+                                                  ),
+                                                  TextFormField(
+                                                    decoration: InputDecoration(labelText: 'Content'),
+                                                    initialValue: post.content,
+                                                    onChanged: (value) {
+                                                      newContent = value;
+                                                    },
+                                                  ),
+                                                  TextFormField(
+                                                    decoration: InputDecoration(labelText: 'Image URL'),
+                                                    initialValue: post.imageUrl ?? '',
+                                                    onChanged: (value) {
+                                                      newImageUrl = value;
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  child: Text('Cancel'),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                                TextButton(
+                                                  child: Text('Save'),
+                                                  onPressed: () {
+                                                    controller.editPost(index, newTitle, newContent, newImageUrl);
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.delete, color: Colors.red, size: 18), // Icono más pequeño
+                                      onPressed: () {
+                                        controller.deletePost(index);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            SizedBox(height: 5),
-                            Text(
-                              post.title,
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.blue[700],
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 5),
+                            Text(post.title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                             Text(post.content),
-                            
                             if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
                               Padding(
                                 padding: const EdgeInsets.only(top: 10),
@@ -58,24 +121,19 @@ class HomeScreens extends StatelessWidget {
                                   fit: BoxFit.cover,
                                 ),
                               ),
-
-                            SizedBox(height: 10),
-                            
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text('Likes: ${post.likes}'),
                                 IconButton(
-                                  icon: Icon(Icons.thumb_up, color: Colors.blue[700]),
+                                  icon: Icon(Icons.thumb_up, color: Colors.blue, size: 18), // Icono más pequeño
                                   onPressed: () {
                                     controller.likePost(index);
                                   },
                                 ),
                               ],
                             ),
-
                             Divider(),
-                            
                             for (var comment in post.comments.asMap().entries)
                               Padding(
                                 padding: const EdgeInsets.only(top: 5),
@@ -83,21 +141,71 @@ class HomeScreens extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
-                                      child: Text(
-                                        '${comment.value.author}: ${comment.value.text}',
-                                        style: TextStyle(fontStyle: FontStyle.italic),
-                                      ),
+                                      child: Text('${comment.value.author}: ${comment.value.text}'),
                                     ),
-                                    IconButton(
-                                      icon: Icon(Icons.delete, color: Colors.red),
-                                      onPressed: () {
-                                        controller.deleteComment(index, comment.key);
-                                      },
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(Icons.edit, color: Colors.grey, size: 16), // Icono más pequeño y gris
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                String newCommentText = comment.value.text;
+                                                String newCommentAuthor = comment.value.author;
+                                                
+                                                return AlertDialog(
+                                                  title: Text('Edit Comment'),
+                                                  content: Column(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      TextFormField(
+                                                        decoration: InputDecoration(labelText: 'Comment'),
+                                                        initialValue: comment.value.text,
+                                                        onChanged: (value) {
+                                                          newCommentText = value;
+                                                        },
+                                                      ),
+                                                      TextFormField(
+                                                        decoration: InputDecoration(labelText: 'Author'),
+                                                        initialValue: comment.value.author,
+                                                        onChanged: (value) {
+                                                          newCommentAuthor = value;
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      child: Text('Cancel'),
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                    TextButton(
+                                                      child: Text('Save'),
+                                                      onPressed: () {
+                                                        controller.editComment(index, comment.key, newCommentText, newCommentAuthor);
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.delete, color: Colors.red, size: 16), // Icono más pequeño
+                                          onPressed: () {
+                                            controller.deleteComment(index, comment.key);
+                                          },
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
                               ),
-                            
                             ElevatedButton(
                               onPressed: () {
                                 showDialog(
@@ -110,13 +218,13 @@ class HomeScreens extends StatelessWidget {
                                       content: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          TextField(
+                                          TextFormField(
                                             decoration: InputDecoration(labelText: 'Comment'),
                                             onChanged: (value) {
                                               commentText = value;
                                             },
                                           ),
-                                          TextField(
+                                          TextFormField(
                                             decoration: InputDecoration(labelText: 'Author'),
                                             onChanged: (value) {
                                               commentAuthor = value;
@@ -147,39 +255,6 @@ class HomeScreens extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text('Delete Post'),
-                                    content: Text('Are you sure you want to delete this post?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          controller.deletePost(index);
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text('Delete'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text('Cancel'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -205,25 +280,25 @@ class HomeScreens extends StatelessWidget {
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextField(
+                    TextFormField(
                       decoration: InputDecoration(labelText: 'Title'),
                       onChanged: (value) {
                         title = value;
                       },
                     ),
-                    TextField(
+                    TextFormField(
                       decoration: InputDecoration(labelText: 'Content'),
                       onChanged: (value) {
                         content = value;
                       },
                     ),
-                    TextField(
+                    TextFormField(
                       decoration: InputDecoration(labelText: 'Author'),
                       onChanged: (value) {
                         author = value;
                       },
                     ),
-                    TextField(
+                    TextFormField(
                       decoration: InputDecoration(labelText: 'Image URL'),
                       onChanged: (value) {
                         imageUrl = value;
@@ -239,9 +314,9 @@ class HomeScreens extends StatelessWidget {
                     },
                   ),
                   TextButton(
-                    child: Text('Post'),
+                    child: Text('Create'),
                     onPressed: () {
-                      controller.addPost(title, content, author, imageUrl);
+                      controller.addPost(title, content, author, imageUrl.isEmpty ? null : imageUrl);
                       Navigator.pop(context);
                     },
                   ),
